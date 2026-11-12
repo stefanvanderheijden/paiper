@@ -1,0 +1,57 @@
+/* paiper default theme: calm, neutral, readable. IBM Plex Sans (SIL OFL, fonts/OFL.txt). */
+@font-face { font-family: 'IBM Plex Sans'; src: url('fonts/IBMPlexSans-Regular.woff'); font-weight: 400; font-style: normal; }
+@font-face { font-family: 'IBM Plex Sans'; src: url('fonts/IBMPlexSans-Italic.woff'); font-weight: 400; font-style: italic; }
+@font-face { font-family: 'IBM Plex Sans'; src: url('fonts/IBMPlexSans-SemiBold.woff'); font-weight: 700; font-style: normal; }
+@font-face { font-family: 'IBM Plex Sans'; src: url('fonts/IBMPlexSans-SemiBoldItalic.woff'); font-weight: 700; font-style: italic; }
+
+:root {
+  --font: 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif;
+  --ink: #1a2433; --strong: #1a2433; --accent: #2563ab; --accent-ink: #fff; --accent2: #c8541f;
+  --tint: #eaf1fa; --light: #f5f7f9; --rule: #dde2e8; --grey: #687385; --muted: #556072;
+  --h1: #1a2433; --h2: #1a2433; --th-bg: #1a2433; --th-ink: #1a2433;
+  --s1: #2563ab; --s2: #c8541f; --s3: #0f9a7c; --s4: #8a5fb5; --s5: #b8891a;
+  --track-h1: 0; --track-h2: 0; --align: left;
+}
+
+/* headings: a large chapter title under a short accent bar */
+.theme-default h1 { font-size: 17pt; line-height: 1.2; margin: 0 0 12pt; padding-top: 9pt; position: relative; }
+.theme-default h1::before { content: ""; position: absolute; left: 0; top: 0; width: 26pt; height: 3pt; background: var(--accent); }
+.theme-default h1 .n { color: var(--accent); min-width: 0; margin-right: 7pt; }
+.theme-default h2 { font-size: 11.5pt; margin: 18pt 0 5pt; }
+.theme-default h2 .n { color: var(--accent); min-width: 0; margin-right: 6pt; }
+.theme-default h3 { font-size: 10pt; margin: 12pt 0 3pt; }
+.theme-default .tocpage h1 { font-size: 17pt; margin-bottom: 14pt; }
+.theme-default .lead { font-size: 11.5pt; line-height: 1.6; color: var(--muted); margin-bottom: 14pt; }
+
+/* tables are ruled ("tables": "ruled" in theme.json); a little more air */
+.theme-default th { font-size: .86em; letter-spacing: .03em; padding: 6pt 9pt; }
+.theme-default td { padding: 5.5pt 9pt; }
+.theme-default tr.hl td { font-weight: 700; }
+
+/* key figures, callouts, cards */
+.theme-default .kpi { background: none; border-top: 1.2pt solid var(--ink); padding: 8pt 10pt 4pt 0; }
+.theme-default .kpi.hot { border-top-color: var(--accent); }
+.theme-default .kpi .v { font-size: 27pt; letter-spacing: -.01em; }
+.theme-default .kpi .l { color: var(--muted); }
+.theme-default .callout { background: var(--tint); border-left: 3pt solid var(--accent); padding: 10pt 14pt; }
+.theme-default .card { background: none; border-top: 1.2pt solid var(--ink); padding: 7pt 10pt 2pt 0; }
+.theme-default figure { margin: 14pt 0 18pt; }
+
+/* cover: a white page that prints without large ink areas: a fine grid with three rings, the title, details below */
+.cover .band { position: absolute; left: 0; right: 0; top: 0; height: 92mm; overflow: hidden;
+  background-image: linear-gradient(to bottom, rgba(255,255,255,0) 55%, #fff 100%),
+                    linear-gradient(rgba(37,99,171,.13) 1px, transparent 1px), linear-gradient(90deg, rgba(37,99,171,.13) 1px, transparent 1px);
+  background-size: 100% 100%, 10mm 10mm, 10mm 10mm; }
+.cover .ring { position: absolute; border: 1.2px solid rgba(37,99,171,.3); border-radius: 50%; }
+.cover .ring.a { width: 150mm; height: 150mm; right: -50mm; top: -60mm; }
+.cover .ring.b { width: 96mm; height: 96mm; right: -23mm; top: -33mm; border-color: rgba(37,99,171,.45); }
+.cover .ring.c { width: 44mm; height: 44mm; right: 3mm; top: -7mm; border-color: var(--accent2); }
+.cover .logo { position: absolute; left: 22mm; top: 20mm; height: 11mm; }
+.cover .kicker { position: absolute; left: 22mm; right: 40mm; top: 104mm; font-size: 9pt; letter-spacing: .18em; text-transform: uppercase; color: var(--accent); font-weight: 700; }
+.cover .title { position: absolute; left: 22mm; right: 40mm; top: 113mm; font-size: 33pt; line-height: 1.1; font-weight: 700; color: var(--ink); letter-spacing: -.015em; }
+.cover .rule { position: absolute; left: 22mm; top: 166mm; width: 30mm; height: 1.8mm; background: var(--accent); }
+.cover .subtitle { position: absolute; left: 22mm; right: 50mm; top: 176mm; font-size: 13pt; line-height: 1.5; color: var(--muted); }
+.cover table.meta { position: absolute; left: 22mm; bottom: 24mm; width: auto; font-size: 9pt; margin: 0; }
+.cover table.meta td { background: none; border: 0; padding: 2pt 16pt 2pt 0; }
+.cover table.meta td:first-child { color: var(--grey); }
+.cover .org { position: absolute; right: 22mm; bottom: 25mm; font-size: 9pt; font-weight: 700; color: var(--ink); }

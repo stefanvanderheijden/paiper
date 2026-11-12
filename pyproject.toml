@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "paiper"
+version = "0.2.0"
+description = "Review what your AI agent writes, on real pages, and send your comments straight back to it."
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [{ name = "Stefan van der Heijden" }]
+keywords = ["ai", "agents", "mcp", "claude", "reports", "review", "pdf", "documents"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: MacOS",
+  "Operating System :: POSIX :: Linux",
+  "Topic :: Text Processing :: Markup :: HTML",
+]
+dependencies = []
+
+[project.optional-dependencies]
+pdf = ["weasyprint>=60"]
+
+[project.scripts]
+paiper = "paiper.cli:main"
+
+[tool.setuptools]
+packages = ["paiper"]
+
+[tool.setuptools.package-data]
+paiper = ["runtime/*", "themes/*/*", "themes/*/fonts/*", "themes/*/assets/*"]
+
+[tool.ruff]
+line-length = 220
+target-version = "py39"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "B"]
+ignore = ["E701", "B007"]

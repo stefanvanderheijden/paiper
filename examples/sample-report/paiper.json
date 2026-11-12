@@ -1,0 +1,28 @@
+{
+  "type": "report",
+  "title": "Sample report",
+  "theme": "default",
+  "content": "content.html",
+  "toc": true,
+  "org": "paiper",
+  "classification": "Example",
+  "cover": {
+    "kicker": "paiper example",
+    "title": "Battery life of a wireless sensor",
+    "subtitle": "A short bench test that shows what a paiper report looks like in the default theme"
+  },
+  "meta": [
+    [
+      "Prepared by",
+      "paiper"
+    ],
+    [
+      "Version",
+      "1.0"
+    ],
+    [
+      "Date",
+      "12-11-2026"
+    ]
+  ]
+}

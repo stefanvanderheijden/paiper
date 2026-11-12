@@ -1,0 +1,14 @@
+{
+  "name": "default",
+  "description": "paiper's neutral house style: IBM Plex Sans, slate ink, blue accent, a colourblind-safe chart palette. Decent for anyone.",
+  "font_family": "IBM Plex Sans",
+  "logo": null,
+  "tables": "ruled",
+  "footer": {"left": "{org}", "center": "{classification}", "right": "page {page}"},
+  "docx": {"font": "IBM Plex Sans", "embed": ["fonts/IBMPlexSans-Regular.ttf", "fonts/IBMPlexSans-Bold.ttf", "fonts/IBMPlexSans-Italic.ttf", "fonts/IBMPlexSans-BoldItalic.ttf"]},
+  "palette": {
+    "ink": "#1a2433", "accent": "#2563ab", "accent2": "#c8541f", "grey": "#687385",
+    "light": "#f5f7f9", "rule": "#dde2e8", "tint": "#eaf1fa",
+    "series": ["#2563ab", "#c8541f", "#0f9a7c", "#8a5fb5", "#b8891a"]
+  }
+}

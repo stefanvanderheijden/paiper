@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+.DS_Store
+.paiper-print.html
+build/
+*.egg-info/
+dist/

@@ -1,0 +1,16 @@
+/* paiper's own interface (top bar, panels, buttons, contents, lightbox, home). Never themed:
+   the document theme only styles the pages. */
+:root {
+  --ui-font: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, Helvetica, Arial, sans-serif;
+  --ui-ink: #1f2328;
+  --ui-muted: #656d76;
+  --ui-line: #d8dee4;
+  --ui-hover: #f3f4f6;
+  --ui-canvas: #e7e9ec;
+  --ui-panel: #ffffff;
+  --ui-accent: #4c5bd4;
+  --ui-accent-ink: #ffffff;
+  --ui-tint: #eef0fc;
+  --ui-warn: #b7791f;
+  --ui-warn-tint: #fdf3dc;
+}
