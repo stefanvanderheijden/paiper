@@ -4,6 +4,7 @@
 
 - `data-running="..."` on a heading puts that text in the page header from that page on (screen and PDF).
 - A contents page longer than one sheet continues on the next ones.
+- Thumb index: `data-tab="12"` on a heading gives its pages a tab on the page edge, stepping down per section (screen and PDF).
 - A heading never starts in the bottom part of a page (`"keep_headings": false` turns that off).
 - Main page: a list with a miniature of each document's cover.
 

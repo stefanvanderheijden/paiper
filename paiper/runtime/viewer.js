@@ -86,6 +86,20 @@
       $('.sh-run', s.el).textContent = marks.length ? marks[0].getAttribute('data-running') : run;
       if (marks.length) run = marks[marks.length - 1].getAttribute('data-running');
     });
+    /* thumb index: data-tab="12" on a heading gives its pages a tab on the page edge; tabs step down in document order */
+    var tabs = $$('[data-tab]', doc).filter(function (e) { return e.getAttribute('data-tab'); });
+    if (tabs.length) {
+      var step = Math.min(6.6, ((CFG.page === 'letter' ? 279.4 : 297) - 45) / tabs.length), curTab = null;
+      sheets.forEach(function (s) {
+        var marks = $$('[data-tab]', s.body), show = marks.length ? marks[0] : curTab;
+        if (marks.length) curTab = marks[marks.length - 1];
+        if (!show || !show.getAttribute('data-tab')) return;
+        var t = document.createElement('div'); t.className = 'sh-tab'; t.textContent = show.getAttribute('data-tab');
+        var h = (step - 0.7) + 'mm';
+        t.style.top = (27 + tabs.indexOf(show) * step) + 'mm'; t.style.height = h; t.style.lineHeight = h;
+        s.el.appendChild(t);
+      });
+    }
     if (toc) {
       $$('.tocpage a', doc).forEach(function (a) {
         var t = document.getElementById(a.getAttribute('href').slice(1));

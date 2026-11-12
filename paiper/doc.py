@@ -12,7 +12,8 @@ paiper.json
   "pdf": "Name.pdf",                      # optional: PDF file name
   "toc": true,                            # contents page after the cover
   "keep_headings": true,                  # a heading never starts in the bottom part of a page (false: let it flow)
-                                          # in the content: data-running="text" on a heading puts that text in the page header from there on
+                                          # in the content: data-running="text" on a heading puts that text in the page header from there on;
+                                          # data-tab="12" on a heading gives its pages a tab on the page edge (a thumb index), data-tab="" ends it
   "cover": {"kicker": "", "title": "", "subtitle": ""},
   "meta": [["Version", "1.0"], ["Date", "..."]],     # rows on the cover
   "org": "", "classification": ""         # used in footer text and the cover
@@ -310,6 +311,7 @@ class Doc:
             body = tag_content(body)
         else:
             body = self.resolve_svg_vars(body)
+            body = self.thumb_tabs(body)
             if self.meta.get("keep_headings", True):          # a heading never starts in the bottom part of a page
                 body = re.sub(r"<h([123])\b(?![^>]*\bpb\b)", lambda m: f'<div class="keep-room{" h3" if m.group(1) == "3" else ""}"></div><h{m.group(1)}', body)
         toc = self.toc(body)
@@ -346,13 +348,14 @@ class Doc:
         page_css = (f":root {{ --page-w: {pw}mm; --page-h: {ph}mm; }} "
                     f"@media print {{ @page {{ size: {size}; margin: 2.7cm 2cm 1.8cm 2cm; "
                     "@top-left { content: element(page-logo); vertical-align: top; } "
+                    + ("@right-top { content: element(thumbtab); vertical-align: top; height: 100%; width: 2cm; } " if "data-tab" in body else "")
                     + (f"@top-right {{ content: string(running); font-family: '{font}'; font-size: 7.5pt; color: #808080; vertical-align: top; "
                        "padding-top: 1.18cm; text-align: right; } " if "data-running" in body else "")
                     + margin_box("bottom-left", foot.get("left", "")) + " "
                     + margin_box("bottom-center", foot.get("center", "")) + " "
                     + margin_box("bottom-right", foot.get("right", "")).replace("vertical-align: top;", "vertical-align: top; text-align: right;")
                     + " } @page cover { size: " + size + "; margin: 0; @top-left { content: none; } @bottom-left { content: none; } "
-                    "@bottom-center { content: none; } @bottom-right { content: none; } @top-right { content: none; } } "
+                    "@bottom-center { content: none; } @bottom-right { content: none; } @top-right { content: none; } @right-top { content: none; } } "
                     "[data-running] { string-set: running attr(data-running); } }")
         running = (f'<img class="running-logo-img" src="{logo_url}" alt="">' if logo_url else esc(self.title))
 
@@ -412,6 +415,28 @@ class Doc:
 </div>
 {scripts}
 </body></html>"""
+
+    TAB_STEP = 6.6          # mm between two tabs of the thumb index; the same numbers are in viewer.js
+
+    def thumb_tabs(self, body):
+        """Thumb index for print: `data-tab="12"` on a heading shows a tab with that label on the outer page edge, on every
+        page until the next data-tab. Tabs step down the edge in document order, so they are staggered on the closed pile
+        of pages. `data-tab=""` ends it. The viewer does the same on screen."""
+        marks = re.findall(r'<\w+\b[^>]*\bdata-tab="([^"]*)"', body)
+        labels = [m for m in marks if m]
+        if not labels:
+            return body
+        room = config.PAGES[self.page][1] - 27 - 18          # the page edge between the top and bottom margin, mm
+        step = min(self.TAB_STEP, room / len(labels))
+        it = iter(range(len(labels)))
+
+        def add(m):
+            label = m.group(2)
+            if not label:                                # inside the heading, so it takes effect on the heading's own page
+                return m.group(0) + '<span class="thumbtab none"></span>'
+            y = next(it) * step
+            return m.group(0) + f'<span class="thumbtab" style="margin-top:{y:.2f}mm;height:{step - .7:.2f}mm;line-height:{step - .7:.2f}mm">{html.escape(label)}</span>'
+        return re.sub(r'<(\w+)\b[^>]*\bdata-tab="([^"]*)"[^>]*>', add, body)
 
     def css_vars(self):
         """CSS custom properties in effect for this document (runtime defaults, theme, document css)."""

@@ -106,7 +106,7 @@ figure img.photo { width: 100%; height: auto; display: block; }
   body { background: var(--ui-canvas); font-size: 15.5px; }
   .topbar, nav.toc, aside.panel, .edbar, .toast, #selbtn, .lightbox, .cbtn, .btn { font-family: var(--ui-font); }
   .topbar, aside.panel, .edbar { color: var(--ui-ink); }
-  .running-logo-wrap { display: none; }
+  .running-logo-wrap, .thumbtab { display: none; }
 
   /* ---- top bar: title left, tools right ---- */
   .topbar { position: sticky; top: 0; z-index: 30; display: flex; align-items: center; justify-content: space-between; gap: 16px; height: 52px; padding: 0 16px 0 18px;
@@ -173,6 +173,7 @@ figure img.photo { width: 100%; height: auto; display: block; }
   .sheet, .cover { width: var(--page-w, 210mm); height: var(--page-h, 297mm); position: relative; overflow: hidden; background: #fff; margin: 0 auto 22px; box-shadow: 0 1px 4px rgba(0,0,0,.18); }
   .sh-head { position: absolute; left: 2cm; right: 2cm; top: .95cm; line-height: 1; font-size: 8pt; color: var(--grey); }
   .sh-head img { height: 25pt; width: auto; }
+  .sh-tab { position: absolute; right: 0; width: 9mm; background: var(--strong); color: #fff; font-size: 7.5pt; font-weight: 700; text-align: center; border-radius: 2pt 0 0 2pt; }
   .sh-run { position: absolute; right: 0; top: .23cm; font-size: 7.5pt; color: #808080; }
   .tocmore { padding-top: 0; }
   .sh-body { position: absolute; left: 2cm; right: 2cm; top: 2.7cm; bottom: 1.8cm; }
@@ -283,6 +284,8 @@ figure img.photo { width: 100%; height: auto; display: block; }
   h1 { font-size: 10.8pt; margin: 22pt 0 10pt; break-after: avoid; }
   h1.pb, h2.pb, figure.pb, table.pb, div.pb, p.pb { break-before: page; }
   /* a heading does not start in the bottom part of a page: an empty block before it that needs room (doc.py adds it) */
+  .thumbtab { position: running(thumbtab); display: block; letter-spacing: 0; text-transform: none; width: 9mm; margin-left: 11mm; background: var(--strong); color: #fff; font-size: 7.5pt; font-weight: 700; text-align: center; border-radius: 2pt 0 0 2pt; }
+  .thumbtab.none { background: none; height: 0; }
   .keep-room { height: 6.5cm; margin-bottom: -6.5cm; break-inside: avoid; }
   .keep-room.h3 { height: 4cm; margin-bottom: -4cm; }
   h2 { font-size: 9.8pt; margin: 16pt 0 6pt; break-after: avoid; }

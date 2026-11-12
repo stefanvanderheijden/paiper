@@ -47,6 +47,8 @@ request, so a saved content.html is visible after a browser reload.
   page (`class="pb"`) and has the same parts in the same order. Put `data-running="Chapter · item"` on its heading: the
   page header then names the section on every page, on screen and in the PDF. Write scores out in words next to
   any number or symbol, so a reader who opens the document in the middle understands them.
+  For a printed catalogue add a thumb index: `data-tab="12"` on each item's heading gives its pages a tab on the
+  page edge, stepping down per item; `data-tab=""` on a later heading ends it.
 - Page flow: a heading never starts in the bottom quarter of a page; paiper moves it to the next page on screen
   and in the PDF (`"keep_headings": false` in paiper.json turns that off). Use `class="pb"` on a heading, figure,
   table or paragraph to force a new page. After a build, look at the PDF pages and fix what still reads badly: a
