@@ -43,6 +43,10 @@ request, so a saved content.html is visible after a browser reload.
   (`--accent`, `--ink`, `--grey`, `--rule`, `--light`, `--tint`, and `--s1` to `--s5` for chart series).
 - Keep files local: put images, data and script libraries in the document folder. By default the browser
   refuses anything a document tries to load from the internet (links to websites work as usual).
+- Long reference documents: give each item (a product, a technology, a test case) its own section that starts on a new
+  page (`class="pb"`) and has the same parts in the same order. Put `data-running="Chapter · item"` on its heading: the
+  page header then names the section on every page, on screen and in the PDF. Write scores out in words next to
+  any number or symbol, so a reader who opens the document in the middle understands them.
 - Page flow: a heading never starts in the bottom quarter of a page; paiper moves it to the next page on screen
   and in the PDF (`"keep_headings": false` in paiper.json turns that off). Use `class="pb"` on a heading, figure,
   table or paragraph to force a new page. After a build, look at the PDF pages and fix what still reads badly: a

@@ -173,6 +173,8 @@ figure img.photo { width: 100%; height: auto; display: block; }
   .sheet, .cover { width: var(--page-w, 210mm); height: var(--page-h, 297mm); position: relative; overflow: hidden; background: #fff; margin: 0 auto 22px; box-shadow: 0 1px 4px rgba(0,0,0,.18); }
   .sh-head { position: absolute; left: 2cm; right: 2cm; top: .95cm; line-height: 1; font-size: 8pt; color: var(--grey); }
   .sh-head img { height: 25pt; width: auto; }
+  .sh-run { position: absolute; right: 0; top: .23cm; font-size: 7.5pt; color: #808080; }
+  .tocmore { padding-top: 0; }
   .sh-body { position: absolute; left: 2cm; right: 2cm; top: 2.7cm; bottom: 1.8cm; }
   .sh-body > :first-child { margin-top: 0 !important; }
   .sh-foot { position: absolute; left: 2cm; right: 2cm; bottom: .7cm; display: flex; font-size: 7.5pt; color: var(--grey); line-height: 1; }

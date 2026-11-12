@@ -12,6 +12,7 @@ paiper.json
   "pdf": "Name.pdf",                      # optional: PDF file name
   "toc": true,                            # contents page after the cover
   "keep_headings": true,                  # a heading never starts in the bottom part of a page (false: let it flow)
+                                          # in the content: data-running="text" on a heading puts that text in the page header from there on
   "cover": {"kicker": "", "title": "", "subtitle": ""},
   "meta": [["Version", "1.0"], ["Date", "..."]],     # rows on the cover
   "org": "", "classification": ""         # used in footer text and the cover
@@ -319,7 +320,8 @@ class Doc:
         cover = self.cover_html(logo_url)
         tocpage = ""
         if self.meta.get("toc", True) and toc:
-            tocpage = f'<div class="tocpage"><h1>{esc(self.meta.get("toc_title", "Contents"))}</h1>' + "".join(
+            tt = esc(self.meta.get("toc_title", "Contents"))
+            tocpage = f'<div class="tocpage"><h1{f" data-running={chr(34)}{tt}{chr(34)}" if "data-running" in body else ""}>{tt}</h1>' + "".join(
                 f'<a class="l{lv}" href="#{i}"><span class="n">{esc(n)}</span>{esc(t)}</a>' for lv, i, n, t in toc) + "</div>"
         nav = '<div class="tt">Contents</div>' + "".join(
             f'<a class="l{lv}" href="#{i}">{esc(n + " ") if n else ""}{esc(t)}</a>' for lv, i, n, t in toc)
@@ -344,11 +346,14 @@ class Doc:
         page_css = (f":root {{ --page-w: {pw}mm; --page-h: {ph}mm; }} "
                     f"@media print {{ @page {{ size: {size}; margin: 2.7cm 2cm 1.8cm 2cm; "
                     "@top-left { content: element(page-logo); vertical-align: top; } "
+                    + (f"@top-right {{ content: string(running); font-family: '{font}'; font-size: 7.5pt; color: #808080; vertical-align: top; "
+                       "padding-top: 1.18cm; text-align: right; } " if "data-running" in body else "")
                     + margin_box("bottom-left", foot.get("left", "")) + " "
                     + margin_box("bottom-center", foot.get("center", "")) + " "
                     + margin_box("bottom-right", foot.get("right", "")).replace("vertical-align: top;", "vertical-align: top; text-align: right;")
                     + " } @page cover { size: " + size + "; margin: 0; @top-left { content: none; } @bottom-left { content: none; } "
-                    "@bottom-center { content: none; } @bottom-right { content: none; } } }")
+                    "@bottom-center { content: none; } @bottom-right { content: none; } @top-right { content: none; } } "
+                    "[data-running] { string-set: running attr(data-running); } }")
         running = (f'<img class="running-logo-img" src="{logo_url}" alt="">' if logo_url else esc(self.title))
 
         cfgjs = {

@@ -34,7 +34,7 @@
     var head = CFG.logo ? '<img src="' + esc(CFG.logo) + '" alt="">' : esc(CFG.title || '');
     function newSheet() {
       var s = document.createElement('div'); s.className = 'sheet';
-      s.innerHTML = '<div class="sh-head">' + head + '</div><div class="sh-body"></div>' +
+      s.innerHTML = '<div class="sh-head">' + head + '<span class="sh-run"></span></div><div class="sh-body"></div>' +
         '<div class="sh-foot"><span>' + esc(f.left) + '</span><span>' + esc(f.center) + '</span><span class="pn"></span></div>';
       doc.appendChild(s);
       var o = { el: s, body: $('.sh-body', s), n: 0 }; sheets.push(o); return o;
@@ -49,8 +49,23 @@
       var b = sh.body.getBoundingClientRect();
       return b.bottom - h.getBoundingClientRect().top < need * b.height;
     }
+    /* a contents page longer than one sheet runs on over the next ones */
+    function placeToc(t) {
+      var sh = newSheet(), part = t, links = $$('a', t), body = function () { return sh.body.getBoundingClientRect().bottom + 0.5; };
+      sh.body.appendChild(part); sh.n++;
+      links.forEach(function (a) { part.removeChild(a); });
+      links.forEach(function (a) {
+        part.appendChild(a);
+        if (a.getBoundingClientRect().bottom > body() && part.children.length > 1) {
+          part.removeChild(a);
+          sh = newSheet(); part = document.createElement('div'); part.className = 'tocpage tocmore';
+          sh.body.appendChild(part); sh.n++; part.appendChild(a);
+        }
+      });
+    }
     var cur = null;
     units.forEach(function (u) {
+      if (u.els[0] === toc) { placeToc(toc); cur = null; return; }
       if (!cur || (u.pb && cur.n > 0)) cur = newSheet();
       u.els.forEach(function (e) { cur.body.appendChild(e); });
       if ((!fits(cur, u) || low(cur, u)) && cur.n > 0) {
@@ -64,8 +79,15 @@
     sections.forEach(function (s) { if (s.parentNode) s.parentNode.removeChild(s); });
     var right = (f.right || 'page {page}');
     sheets.forEach(function (s, i) { $('.pn', s.el).textContent = right.replace('{pages}', sheets.length + 1).replace('{page}', i + 2); });
+    /* the page header names the section the page is in: the first data-running on the page, else the one still in force */
+    var run = '';
+    sheets.forEach(function (s) {
+      var marks = $$('[data-running]', s.body);
+      $('.sh-run', s.el).textContent = marks.length ? marks[0].getAttribute('data-running') : run;
+      if (marks.length) run = marks[marks.length - 1].getAttribute('data-running');
+    });
     if (toc) {
-      $$('a', toc).forEach(function (a) {
+      $$('.tocpage a', doc).forEach(function (a) {
         var t = document.getElementById(a.getAttribute('href').slice(1));
         var sh = t && t.closest('.sheet'); if (!sh) return;
         var n = sheets.map(function (x) { return x.el; }).indexOf(sh) + 2;
