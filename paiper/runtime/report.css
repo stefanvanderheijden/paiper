@@ -280,6 +280,9 @@ figure img.photo { width: 100%; height: auto; display: block; }
   .tocpage .n { display: inline-block; min-width: 24pt; }
   h1 { font-size: 10.8pt; margin: 22pt 0 10pt; break-after: avoid; }
   h1.pb, h2.pb, figure.pb, table.pb, div.pb, p.pb { break-before: page; }
+  /* a heading does not start in the bottom part of a page: an empty block before it that needs room (doc.py adds it) */
+  .keep-room { height: 6.5cm; margin-bottom: -6.5cm; break-inside: avoid; }
+  .keep-room.h3 { height: 4cm; margin-bottom: -4cm; }
   h2 { font-size: 9.8pt; margin: 16pt 0 6pt; break-after: avoid; }
   table, figure, tr { break-inside: avoid; }
   figure.wide { break-inside: auto; }

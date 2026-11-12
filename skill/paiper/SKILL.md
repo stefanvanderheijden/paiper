@@ -35,6 +35,7 @@ The MCP server `paiper` offers the same (list_documents, review_items, reply_ite
 - Ready-made classes: `kpis/kpi(.hot)`, `callout` (with `.t` title), `table.wf` + `<caption>`, `figure` + `figcaption .ft/.fd`, `photos2`, `photos3`, `img.photo`, `cards/card`, `chip`, `muted`. `examples/sample-report` in the repo shows them.
 - Do NOT limit yourself to these: draw any chart, diagram or illustration as inline SVG (or canvas/JS) when it explains better. Use theme colours via CSS variables (`style="fill:var(--accent)"`, `--ink`, `--grey`, `--light`, `--rule`, `--tint`, chart series `--s1` to `--s5` in that order) or `paiper.palette("<theme>")` in a build script. `paiper.charts` has optional helpers.
 - Keep everything local: images, data and script libraries go in the document folder. The browser blocks what a document tries to load from the internet (ordinary links are fine).
+- Check the pages after a build (`paiper pdf`, then look at them): pictures large enough to read (technical drawings need most of the text width), no near-empty pages. paiper already keeps a heading from starting at the bottom of a page; `class="pb"` forces a new page.
 - Data-driven documents: a `build.py` that writes `content.html` and `paiper.json`; set `"build": "python3 build.py"`. `paiper build` puts the repo on PYTHONPATH (`from paiper import charts`).
 
 ## Processing the user's review

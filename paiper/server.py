@@ -3,6 +3,7 @@
   /                          all documents, with open review items
   /d/<root>/<path>/          a document (rendered on every request, so it is always current)
   /d/<root>/<path>/<file>    files next to it (photos, PDF, ...)
+  /cover/<root>/<path>/      only the cover (the miniature on the main page)
   /_paiper/rt/<file>         runtime (css, js)
   /_paiper/themes/<name>/... theme files
   /api/comments?doc=<id>     GET list, POST add;  /api/comments/<id>  PUT, DELETE
@@ -59,8 +60,10 @@ def home_page(cfg):
         sub = strip_tags(str(doc.meta.get("cover", {}).get("subtitle", "")))
         ver = doc.meta_value("Version")
         bits = [x for x in (crumb, f"v{ver}" if ver else "", time.strftime("%d %b %Y", time.localtime(mt)) if mt else "") if x]
+        w, h = config.PAGES[doc.page]
         return (f'<a class="card" href="{doc_url(doc.id)}" data-q="{esc((doc.title + " " + sub + " " + doc.id).lower())}">'
-                f'<span class="thumb" style="--c:{accent}"><i></i><i></i><i></i></span>'
+                f'<span class="thumb" style="--c:{accent};--w:{w};--h:{h}"><iframe src="/cover/{quote(doc.id)}/" loading="lazy" tabindex="-1" aria-hidden="true" '
+                f'style="width:{w}mm;height:{h}mm"></iframe></span>'
                 f'<span class="body"><span class="t">{esc(doc.title)}</span>'
                 + (f'<span class="s">{esc(sub)}</span>' if sub else "")
                 + f'<span class="m">{esc(" · ".join(bits))}</span></span>'
@@ -78,7 +81,7 @@ def home_page(cfg):
     for (root, folder), items in sorted(groups.items(), key=order):
         parts = [p_ for p_ in folder.split("/") if p_]
         head = "".join(f"<span>{esc(p_)}</span>" for p_ in parts[-3:-1]) + f"<b>{esc(parts[-1] if parts else root)}</b>"
-        out.append(f'<section><h2 title="{esc(root + "/" + folder)}">{head}</h2><div class="grid">'
+        out.append(f'<section><h2 title="{esc(root + "/" + folder)}">{head}</h2><div class="list">'
                    + "".join(card(doc, mt) for doc, mt, _, _ in sorted(items, key=lambda x: (-x[0].open_count(), -x[1]))) + "</div></section>")
     if not docs:
         out.append('<p class="none">No documents yet. Ask your agent for a report, or run <code>paiper new &lt;folder&gt; --title "..."</code>. '
@@ -241,6 +244,14 @@ class Handler(SimpleHTTPRequestHandler):
         if path == "/api/comments":
             doc = self._doc_from_query(q)
             return self._json(200, store.load(doc.dir)) if doc else self._json(404, {"error": "no such document"})
+        if path.startswith("/cover/"):                                   # only the cover, for the miniatures on the main page
+            p = config.resolve_id(path[7:].rstrip("/"), self.cfg)
+            if not p or not os.path.isfile(os.path.join(p, "paiper.json")):
+                return self._send(404, "not found", "text/plain")
+            try:
+                return self._send(200, Doc(p, self.cfg).render_cover())
+            except Exception as e:  # noqa: BLE001
+                return self._send(500, f"<pre>{html.escape(repr(e))}</pre>")
         if path.startswith("/d/"):
             p = config.resolve_id(path[3:].rstrip("/"), self.cfg)
             if not p:

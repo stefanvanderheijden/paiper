@@ -43,6 +43,10 @@ request, so a saved content.html is visible after a browser reload.
   (`--accent`, `--ink`, `--grey`, `--rule`, `--light`, `--tint`, and `--s1` to `--s5` for chart series).
 - Keep files local: put images, data and script libraries in the document folder. By default the browser
   refuses anything a document tries to load from the internet (links to websites work as usual).
+- Page flow: a heading never starts in the bottom quarter of a page; paiper moves it to the next page on screen
+  and in the PDF (`"keep_headings": false` in paiper.json turns that off). Use `class="pb"` on a heading, figure,
+  table or paragraph to force a new page. After a build, look at the PDF pages and fix what still reads badly: a
+  picture too small to read, a near-empty page, a table split from its heading.
 - Keep wide things inside the text width (17 cm on A4, 17.6 cm on Letter); a block taller than a page is not
   split on screen.
 

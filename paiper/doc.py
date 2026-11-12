@@ -11,6 +11,7 @@ paiper.json
   "css": "style.css",                     # optional: extra stylesheet for this document only
   "pdf": "Name.pdf",                      # optional: PDF file name
   "toc": true,                            # contents page after the cover
+  "keep_headings": true,                  # a heading never starts in the bottom part of a page (false: let it flow)
   "cover": {"kicker": "", "title": "", "subtitle": ""},
   "meta": [["Version", "1.0"], ["Date", "..."]],     # rows on the cover
   "org": "", "classification": ""         # used in footer text and the cover
@@ -23,6 +24,7 @@ import os
 import re
 from html.parser import HTMLParser
 from pathlib import Path
+from urllib.parse import quote
 
 from . import config, store
 from .css import css_rules
@@ -267,6 +269,32 @@ class Doc:
             items.append((int(m.group(1)), idm.group(1), num, text))
         return items
 
+    def cover_html(self, logo_url):
+        """The theme's cover filled in for this document."""
+        th, esc = self.theme, html.escape
+        cv = self.meta.get("cover", {})
+        meta_rows = "".join(f"<tr><td>{esc(str(k))}</td><td>{v}</td></tr>" for k, v in self.meta.get("meta", []))
+        cover = (th.cover.replace("{{logo}}", f'<img class="logo" src="{logo_url}" alt="">' if logo_url else "")
+                 .replace("{{kicker}}", cv.get("kicker", "")).replace("{{title}}", cv.get("title", self.title))
+                 .replace("{{subtitle}}", cv.get("subtitle", ""))
+                 .replace("{{meta}}", f'<table class="meta">{meta_rows}</table>' if meta_rows else "")
+                 .replace("{{org}}", esc(self.field("org"))).replace("{{classification}}", esc(self.field("classification"))))
+        cover = re.sub(r"\{\{(\w+)\}\}", lambda m: esc(str(self.field(m.group(1)) or cv.get(m.group(1), ""))), cover)
+        return cover
+
+    def render_cover(self):
+        """A page with only the cover, at page size: the main page shows it scaled down as a miniature."""
+        tu = f"/_paiper/themes/{self.theme.name}/"
+        logo = self.theme.meta.get("logo")
+        pw, ph = config.PAGES[self.page]
+        css = f'<link rel="stylesheet" href="{self.meta["css"]}">' if self.meta.get("css") else ""
+        base = html.escape("/d/" + quote(self.id or "") + "/")
+        return (f'<!DOCTYPE html><html><head><meta charset="utf-8"><base href="{base}"><link rel="stylesheet" href="/_paiper/rt/report.css">'
+                f'<link rel="stylesheet" href="{tu}theme.css">{css}'
+                f'<style>:root {{ --page-w: {pw}mm; --page-h: {ph}mm; }} html, body {{ margin: 0; overflow: hidden; background: #fff; }} '
+                f'.cover {{ width: {pw}mm; height: {ph}mm; position: relative; overflow: hidden; font-size: 9.6pt; }}</style></head>'
+                f'<body class="paiper report theme-{self.theme.name}"><div class="cover">{self.cover_html((tu + logo) if logo else None)}</div></body></html>')
+
     def render(self, mode="server", editable=True):
         """mode: 'server' (viewer with comments/edits), 'print' (WeasyPrint, file URLs), 'export' (static folder)."""
         th = self.theme
@@ -281,19 +309,14 @@ class Doc:
             body = tag_content(body)
         else:
             body = self.resolve_svg_vars(body)
+            if self.meta.get("keep_headings", True):          # a heading never starts in the bottom part of a page
+                body = re.sub(r"<h([123])\b(?![^>]*\bpb\b)", lambda m: f'<div class="keep-room{" h3" if m.group(1) == "3" else ""}"></div><h{m.group(1)}', body)
         toc = self.toc(body)
         esc = html.escape
         logo = th.meta.get("logo")
         logo_url = (tu + logo) if logo else None
 
-        cv = self.meta.get("cover", {})
-        meta_rows = "".join(f"<tr><td>{esc(str(k))}</td><td>{v}</td></tr>" for k, v in self.meta.get("meta", []))
-        cover = (th.cover.replace("{{logo}}", f'<img class="logo" src="{logo_url}" alt="">' if logo_url else "")
-                 .replace("{{kicker}}", cv.get("kicker", "")).replace("{{title}}", cv.get("title", self.title))
-                 .replace("{{subtitle}}", cv.get("subtitle", ""))
-                 .replace("{{meta}}", f'<table class="meta">{meta_rows}</table>' if meta_rows else "")
-                 .replace("{{org}}", esc(self.field("org"))).replace("{{classification}}", esc(self.field("classification"))))
-        cover = re.sub(r"\{\{(\w+)\}\}", lambda m: esc(str(self.field(m.group(1)) or cv.get(m.group(1), ""))), cover)
+        cover = self.cover_html(logo_url)
         tocpage = ""
         if self.meta.get("toc", True) and toc:
             tocpage = f'<div class="tocpage"><h1>{esc(self.meta.get("toc_title", "Contents"))}</h1>' + "".join(

@@ -42,11 +42,18 @@
     function fits(sh, u) {
       return u.els[u.els.length - 1].getBoundingClientRect().bottom <= sh.body.getBoundingClientRect().bottom + 0.5;
     }
+    /* a heading does not start in the bottom part of a page: it needs room below it (the same rule as in print) */
+    var ROOM = { H1: 0.26, H2: 0.26, H3: 0.16 };
+    function low(sh, u) {
+      var h = u.els[0], need = ROOM[h.tagName]; if (!need) return false;
+      var b = sh.body.getBoundingClientRect();
+      return b.bottom - h.getBoundingClientRect().top < need * b.height;
+    }
     var cur = null;
     units.forEach(function (u) {
       if (!cur || (u.pb && cur.n > 0)) cur = newSheet();
       u.els.forEach(function (e) { cur.body.appendChild(e); });
-      if (!fits(cur, u) && cur.n > 0) {
+      if ((!fits(cur, u) || low(cur, u)) && cur.n > 0) {
         u.els.forEach(function (e) { e.parentNode.removeChild(e); });
         cur = newSheet();
         u.els.forEach(function (e) { cur.body.appendChild(e); });
