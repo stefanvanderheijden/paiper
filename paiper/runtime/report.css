@@ -114,7 +114,7 @@ figure img.photo { width: 100%; height: auto; display: block; }
     border-bottom: 1px solid var(--ui-line); font-size: 13px; }
   .tb-left { display: flex; align-items: center; gap: 12px; min-width: 0; }
   .topbar .home { text-decoration: none; color: var(--ui-ink); font-weight: 700; font-size: 15px; letter-spacing: -.02em; padding-right: 12px; border-right: 1px solid var(--ui-line); line-height: 20px; }
-  .topbar .home b { color: var(--ui-accent); font-weight: 700; }
+  .topbar .home b { color: var(--ui-logo); font-weight: 700; }
   .tb-title { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .tb-ver { flex: none; font-size: 11px; font-weight: 600; color: var(--ui-muted); background: var(--ui-hover); border: 1px solid var(--ui-line); border-radius: 99px; padding: 1px 7px; font-variant-numeric: tabular-nums; }
   .tb-right { display: flex; align-items: center; gap: 8px; flex: none; }
