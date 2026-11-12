@@ -23,7 +23,7 @@ from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import parse_qs, quote, unquote, urlparse
 
 from . import config, store
-from .doc import Doc
+from .doc import Doc, strip_tags
 
 mimetypes.add_type("font/woff", ".woff")
 mimetypes.add_type("font/woff2", ".woff2")
@@ -36,36 +36,65 @@ def doc_url(docid):
 
 
 def home_page(cfg):
-    rows = {}
+    """The main page: every document as a card, the ones with open review items first, then per folder."""
+    esc = html.escape
+    docs = []
     for d in config.find_docs(cfg):
         try:
             doc = Doc(d, cfg)
         except Exception as e:  # noqa: BLE001
             print("skip", d, e, file=sys.stderr)
             continue
-        group = (os.path.dirname(doc.id.split("/", 1)[1]) if "/" in doc.id else "") or doc.id.split("/", 1)[0]
         try:
             mtime = max(os.path.getmtime(doc.content_path), os.path.getmtime(os.path.join(d, "paiper.json")))
         except OSError:
             mtime = 0
-        rows.setdefault(group, []).append((doc, mtime))
-    esc = html.escape
+        root, _, rel = doc.id.partition("/")
+        docs.append((doc, mtime, root, os.path.dirname(rel)))
+
+    def card(doc, mt, crumb=""):
+        n = doc.open_count()
+        accent = doc.theme.meta.get("palette", {}).get("accent", "#687385")
+        accent = accent if re.fullmatch(r"#[0-9a-fA-F]{3,8}", accent) else "#687385"
+        sub = strip_tags(str(doc.meta.get("cover", {}).get("subtitle", "")))
+        ver = doc.meta_value("Version")
+        bits = [x for x in (crumb, f"v{ver}" if ver else "", time.strftime("%d %b %Y", time.localtime(mt)) if mt else "") if x]
+        return (f'<a class="card" href="{doc_url(doc.id)}" data-q="{esc((doc.title + " " + sub + " " + doc.id).lower())}">'
+                f'<span class="thumb" style="--c:{accent}"><i></i><i></i><i></i></span>'
+                f'<span class="body"><span class="t">{esc(doc.title)}</span>'
+                + (f'<span class="s">{esc(sub)}</span>' if sub else "")
+                + f'<span class="m">{esc(" · ".join(bits))}</span></span>'
+                + (f'<span class="open">{n} open</span>' if n else "") + "</a>")
+
     out = []
-    for g in sorted(rows):
-        out.append(f'<h2>{esc(g)}</h2><div class="list">')
-        for doc, mt in sorted(rows[g], key=lambda x: -x[1]):
-            n = doc.open_count()
-            out.append(f'<a class="item" href="{doc_url(doc.id)}"><span class="t">{esc(doc.title)}</span>'
-                       f'<span class="ty">{esc(doc.type)} · {esc(doc.theme.name)}</span>'
-                       f'<span class="c{" on" if n else ""}">{n if n else ""}{" open" if n else ""}</span>'
-                       f'<span class="d">{time.strftime("%d %b %Y", time.localtime(mt)) if mt else ""}</span></a>')
-        out.append("</div>")
-    if not rows:
-        out.append('<p class="none">No documents yet. A document is any folder with a paiper.json below: '
-                   + ", ".join(esc(v) for v in cfg["roots"].values()) + "</p>")
-    return f"""<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+    total = sum(x[0].open_count() for x in docs)
+    groups = {}
+    for x in docs:
+        groups.setdefault((x[2], x[3]), []).append(x)
+
+    def order(kv):                                   # folders with open review items first, then the most recently changed
+        (root, _), items = kv
+        return (root == "paiper-examples", -sum(x[0].open_count() for x in items), -max(x[1] for x in items))
+    for (root, folder), items in sorted(groups.items(), key=order):
+        parts = [p_ for p_ in folder.split("/") if p_]
+        head = "".join(f"<span>{esc(p_)}</span>" for p_ in parts[-3:-1]) + f"<b>{esc(parts[-1] if parts else root)}</b>"
+        out.append(f'<section><h2 title="{esc(root + "/" + folder)}">{head}</h2><div class="grid">'
+                   + "".join(card(doc, mt) for doc, mt, _, _ in sorted(items, key=lambda x: (-x[0].open_count(), -x[1]))) + "</div></section>")
+    if not docs:
+        out.append('<p class="none">No documents yet. Ask your agent for a report, or run <code>paiper new &lt;folder&gt; --title "..."</code>. '
+                   "A document is any folder with a paiper.json below: " + ", ".join(esc(v) for v in cfg["roots"].values()) + "</p>")
+    search = ('<input id="q" type="search" placeholder="Search documents" aria-label="Search documents" autocomplete="off">' if len(docs) > 6 else "")
+    script = """<script>(function(){var q=document.getElementById('q');if(!q)return;q.addEventListener('input',function(){var v=q.value.trim().toLowerCase();
+document.querySelectorAll('.card').forEach(function(c){c.hidden=!!v&&c.getAttribute('data-q').indexOf(v)<0;});
+document.querySelectorAll('section').forEach(function(s){s.hidden=!s.querySelector('.card:not([hidden])');});});
+document.addEventListener('keydown',function(e){if(e.key==='/'&&document.activeElement!==q){e.preventDefault();q.focus();}});})();</script>"""
+    count = f'{len(docs)} document{"s" if len(docs) != 1 else ""}'
+    if total:
+        count += f' <b class="wait">{total} open for your agent</b>'
+    return f"""<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>paiper</title><link rel="stylesheet" href="/_paiper/rt/ui.css"><link rel="stylesheet" href="/_paiper/rt/home.css"></head>
-<body><header><b>p<span>ai</span>per</b><span>documents</span></header><main>{''.join(out)}</main></body></html>"""
+<body><header><div class="bar"><b>p<span>ai</span>per</b><span class="count">{count}</span>{search}</div></header>
+<main>{''.join(out)}</main>{script if search else ''}</body></html>"""
 
 
 # Documents are free HTML and may run scripts. This keeps a document from fetching code from, or sending
