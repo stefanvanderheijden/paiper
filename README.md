@@ -22,6 +22,21 @@ The sample in `examples/`, as PDF:
 
 ![Cover, summary with key figures, charts and tables as PDF pages](docs/pages.png)
 
+## Where it came from: a field test report
+
+paiper grew out of one report. A machine had run for several days at a customer site, and the material was large and scattered: per-item log files, throughput data, hundreds of camera stills and video clips, notes from the days on site, earlier documents about the product, and the machine's own codebase.
+
+An agent read all of it and built one report: 47 pages, with charts drawn from the logs, annotated photos, and tables whose numbers a build script checks against the data on every run.
+
+The review is what made it usable. The author read the report at his own pace and left 140 comments over three rounds, each one on the paragraph, chart or photo it was about: "split this chart per day", "this number contradicts section 3", "use the photo where the edge is visible". There was no copying text into a chat and no explaining where something was. The agent worked through each batch, changed the script and the data analysis behind it, and answered every comment in the margin.
+
+What that takes, and what paiper provides:
+
+- **From a lot of context to one document.** The agent does the reading and the analysis. The report is where you check it.
+- **Review in batches.** Comment on everything you notice, then hand over the whole list. The agent does not need you while it works, and you do not need the agent while you read.
+- **Graphics without a ceiling.** Charts, diagrams and photo layouts are web graphics, so the agent can redraw any of them when a comment asks for it.
+- **Numbers that stay right.** A generated document is rebuilt from the data, so a corrected analysis updates every figure that depends on it.
+
 ## What you get
 
 - **The whole web toolbox.** A document is free HTML: inline SVG charts and diagrams, CSS layout, scripts, video. paiper does not limit the agent to a set of components, and a word processor's drawing tools are not the ceiling.
