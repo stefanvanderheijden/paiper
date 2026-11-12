@@ -24,11 +24,11 @@ The sample in `examples/`, as PDF:
 
 ## Where it came from: a field test report
 
-paiper grew out of one report. A machine had run for several days at a customer site, and the material was large and scattered: per-item log files, throughput data, hundreds of camera stills and video clips, notes from the days on site, earlier documents about the product, and the machine's own codebase.
+paiper grew out of one report. A machine had run for several days at a customer site, and the material was large and scattered: per-item log files, throughput data, camera stills and video clips, notes from the days on site, earlier documents about the product, and the machine's own codebase.
 
 An agent read all of it and built one report: 47 pages, with charts drawn from the logs, annotated photos, and tables whose numbers a build script checks against the data on every run.
 
-The review is what made it usable. The author read the report at his own pace and left 140 comments over three rounds, each one on the paragraph, chart or photo it was about: "split this chart per day", "this number contradicts section 3", "use the photo where the edge is visible". There was no copying text into a chat and no explaining where something was. The agent worked through each batch, changed the script and the data analysis behind it, and answered every comment in the margin.
+The review is what made it usable. The author read the report at his own pace and left 140 comments over three rounds, each one on the paragraph, chart or photo it was about: split a chart differently, question a number, swap a photo, rewrite a conclusion. There was no copying text into a chat and no explaining where something was. The agent worked through each batch, changed the script and the data analysis behind it, and answered every comment in the margin.
 
 What that takes, and what paiper provides:
 
